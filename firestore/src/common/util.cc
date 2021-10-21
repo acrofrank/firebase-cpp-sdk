@@ -16,12 +16,41 @@
 
 #include "firestore/src/common/util.h"
 
+#include <cctype>
+#include <chrono>
+#include <ctime>
+#include <string>
+
+#include "app/src/log.h"
+
 namespace firebase {
 namespace firestore {
 
 const std::string& EmptyString() {
   static const std::string kEmptyString;
   return kEmptyString;
+}
+
+namespace detail {
+
+std::string FormattedTimestamp() {
+  auto timestamp = std::chrono::system_clock::now();
+  std::time_t ctime_timestamp = std::chrono::system_clock::to_time_t(timestamp);
+  std::string formatted_timestamp(std::ctime(&ctime_timestamp));
+  while (formatted_timestamp.size() > 0) {
+    auto last_char = formatted_timestamp[formatted_timestamp.size() - 1];
+    if (!std::isspace(last_char)) {
+      break;
+    }
+    formatted_timestamp.pop_back();
+  }
+  return formatted_timestamp;
+}
+
+void UnityIssue1154TestLog0(std::ostringstream& ss) {
+  LogInfo(ss.str().c_str());
+}
+
 }
 
 }  // namespace firestore
