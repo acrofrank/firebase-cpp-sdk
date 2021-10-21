@@ -17,6 +17,7 @@
 #ifndef FIREBASE_FIRESTORE_SRC_COMMON_UTIL_H_
 #define FIREBASE_FIRESTORE_SRC_COMMON_UTIL_H_
 
+#include <sstream>
 #include <string>
 
 namespace firebase {
@@ -32,6 +33,27 @@ const std::string& EmptyString();
 template <typename T>
 bool EqualityCompare(T* lhs, T* rhs) {
   return lhs == rhs || (lhs != nullptr && rhs != nullptr && *lhs == *rhs);
+}
+
+namespace detail {
+
+std::string FormattedTimestamp();
+
+void UnityIssue1154TestLog0(std::ostringstream& ss);
+
+template <typename T, typename... U>
+void UnityIssue1154TestLog0(std::ostringstream& ss, T message, U... rest) {
+  ss << message;
+  UnityIssue1154TestLog0(ss, rest...);
+}
+
+}
+
+template <typename... T>
+void UnityIssue1154TestLog(T... messages) {
+  std::ostringstream ss;
+  ss << "<<<<< " << detail::FormattedTimestamp() << " == ";
+  detail::UnityIssue1154TestLog0(ss, messages...);
 }
 
 }  // namespace firestore
