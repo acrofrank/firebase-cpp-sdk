@@ -57,20 +57,26 @@ CollectionReference DocumentReferenceInternal::Collection(
 }
 
 Future<DocumentSnapshot> DocumentReferenceInternal::Get(Source source) {
+  UnityIssue1154TestLog("DocumentReferenceInternal::Get() start");
   auto promise =
       promise_factory_.CreatePromise<DocumentSnapshot>(AsyncApis::kGet);
   auto listener = ListenerWithPromise<api::DocumentSnapshot>(promise);
   reference_.GetDocument(ToCoreApi(source), std::move(listener));
-  return promise.future();
+  auto result = promise.future();
+  UnityIssue1154TestLog("DocumentReferenceInternal::Get() done");
+  return result;
 }
 
 Future<void> DocumentReferenceInternal::Set(const MapFieldValue& data,
                                             const SetOptions& options) {
+  UnityIssue1154TestLog("DocumentReferenceInternal::Set() start");
   auto promise = promise_factory_.CreatePromise<void>(AsyncApis::kSet);
   auto callback = StatusCallbackWithPromise(promise);
   ParsedSetData parsed = user_data_converter_.ParseSetData(data, options);
   reference_.SetData(std::move(parsed), std::move(callback));
-  return promise.future();
+  auto result = promise.future();
+  UnityIssue1154TestLog("DocumentReferenceInternal::Set() done");
+  return result;
 }
 
 Future<void> DocumentReferenceInternal::Update(const MapFieldValue& data) {
